@@ -1,0 +1,68 @@
+
+plugins {
+    id 'java'
+    id 'com.gtnewhorizons.retrofuturagradle' version '1.3.33'
+}
+
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+
+version = "1.0"
+
+group = 'hohserg.test'
+
+base {
+    archivesName = 'module2'
+}
+
+minecraft {
+    mcVersion = '1.12.2'
+    username = 'dev'
+    useDependencyAccessTransformers = true
+
+    // Automatic token injection with RetroFuturaGradle
+    /*
+    if (gradleTokenModId) {
+        injectedTags.put gradleTokenModId, modId
+    }
+    if (gradleTokenModName) {
+        injectedTags.put gradleTokenModName, modName
+    }
+    if (gradleTokenVersion) {
+        injectedTags.put gradleTokenVersion, modVersion
+    }
+    */
+
+    // JVM arguments
+    extraRunJvmArguments.add("-ea:${group}")
+}
+repositories {
+    flatDir {
+        dirs "${project.rootDir}/libs"
+    }
+}
+
+configurations {
+    extraLibs { transitive = false }
+    implementation.extendsFrom extraLibs
+}
+
+dependencies {
+    extraLibs project(":module1")
+}
+
+jar {
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
